@@ -35,7 +35,7 @@ def total_calibration(inputs):
     return total_calibration
 
 
-with open('runs/sources/puzzleinput.txt', 'r', encoding='utf-8') as puzzleinput:
+with open('runs/sources/puzzleinput_1.txt', 'r', encoding='utf-8') as puzzleinput:
     inputs = puzzleinput.read().splitlines()
 
 print('-----------TOTAL CALIBRATION:', total_calibration(inputs))
