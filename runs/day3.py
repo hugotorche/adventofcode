@@ -66,4 +66,4 @@ def gear_ratios(inputs):
 with open('runs/sources/puzzleinput_3.txt', 'r', encoding='utf-8') as puzzleinput:
     inputs = puzzleinput.read().splitlines()
 
-print(gear_ratios(inputs))
+# print(gear_ratios(inputs))
