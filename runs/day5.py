@@ -31,7 +31,7 @@ def map_dict(inputs):
     return map_dict
 
 
-def min_location(mode='default'):
+def min_location(inputs, mode='default'):
 
     # First loop seed by seed
     seeds = init_seeds(inputs, mode=mode)
@@ -66,4 +66,4 @@ def min_location(mode='default'):
 with open('runs/sources/puzzleinput_5.txt', 'r', encoding='utf-8') as puzzleinput:
     inputs = puzzleinput.read().split("\n\n")
 
-print(min_location())
+# print(min_location())
