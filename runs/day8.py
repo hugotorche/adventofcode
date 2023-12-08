@@ -28,4 +28,4 @@ def aaa_to_zzz(puzzle):
     return steps
 
 
-print(aaa_to_zzz(puzzle))
+# print(aaa_to_zzz(puzzle))
