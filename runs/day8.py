@@ -1,23 +1,31 @@
-puzzle = '''RL
-
-AAA = (BBB, CCC)
-BBB = (DDD, EEE)
-CCC = (ZZZ, GGG)
-DDD = (DDD, DDD)
-EEE = (EEE, EEE)
-GGG = (GGG, GGG)
-ZZZ = (ZZZ, ZZZ)'''
+with open('runs/sources/puzzleinput_8.txt', 'r', encoding='utf-8') as puzzleinput:
+    puzzle = puzzleinput.read()
 
 
 def init_map(puzzle):
-    puzzle = puzzle.splitlines()
+    puzzle = puzzle.replace('(', '').replace(')', '').splitlines()
     instructions = [char for char in puzzle[0]]
-    coordinates = [coor.split(' = ') for coor in puzzle[2:]]
 
-    for coordinate in coordinates:
-        coordinate[1] = coordinate[1].replace('(', '').replace(')', '')
-        coordinate[1] = coordinate[1].split(', ')
+    coordinates_keys = [coor.split(' = ')[0] for coor in puzzle[2:]]
+    coordinates_values = [coor.split(' = ')[1].split(', ') for coor in puzzle[2:]]
+    coordinates = dict(zip(coordinates_keys, coordinates_values))
+
+    print(coordinates)
 
     return instructions, coordinates
 
-print(init_map(puzzle))
+
+def aaa_to_zzz(puzzle):
+    instructions, coordinates = init_map(puzzle)
+    steps = 0
+    target_key = 'AAA'
+    while target_key != 'ZZZ':
+        for i in range(len(instructions)):
+            coordinate_index = 1 if instructions[i] == 'R' else 0
+            target_key = coordinates[target_key][coordinate_index]
+            steps += 1
+
+    return steps
+
+
+print(aaa_to_zzz(puzzle))
