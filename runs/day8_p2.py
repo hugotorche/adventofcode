@@ -50,4 +50,4 @@ def aaa_to_zzz(puzzle):
                 break
 
 
-print(aaa_to_zzz(puzzle_3))
+# print(aaa_to_zzz(puzzle_3))
