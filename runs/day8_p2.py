@@ -21,6 +21,8 @@ def init_map(puzzle):
     coordinates_values = [coor.split(' = ')[1].split(', ') for coor in puzzle[2:]]
     coordinates = dict(zip(coordinates_keys, coordinates_values))
 
+    print('--- Base coordinates:')
+    print(coordinates)
     return instructions, coordinates
 
 
@@ -34,6 +36,12 @@ def aaa_to_zzz(puzzle):
     unique_last = ''.join(set([key[2] for key in target_keys])) # A
     searching_z = True
 
+    print('--- First Target Keys:')
+    print(target_keys, unique_last)
+
+    print('--- Search Instructions:')
+    print(instructions)
+
     while searching_z:
         for i in range(len(instructions)):
             coor_index = 1 if instructions[i] == 'R' else 0
@@ -43,11 +51,12 @@ def aaa_to_zzz(puzzle):
                 new_target_keys.append(key_match)
             target_keys = new_target_keys
             steps += 1
-            unique_last = ''.join(sorted([key[2] for key in target_keys]))
-
-            if unique_last == 'ZZZZZ':
+            unique_last = ''.join(sorted(set([key[2] for key in target_keys])))
+            if unique_last == 'Z':
                 searching_z = False
-                break
+                print('--- Final steps:')
+                yield steps
 
 
-# print(aaa_to_zzz(puzzle_3))
+for value in aaa_to_zzz(puzzle_3):
+    print(value)
