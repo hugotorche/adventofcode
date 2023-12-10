@@ -65,11 +65,9 @@ for d in digits_matrix:
 
 steps = 0
 
-print(next_points)
 for i in range(len(next_points)):
     while len(next_points) > 0:
         point = next_points[i]
-        print('starting point---', point)
         point_symbol = puzzle[point[0]][point[1]]
         point_digit = int(digits_matrix[point[0]][point[1]])
         p_coors = [(point[0], point[1]-1),
@@ -83,9 +81,7 @@ for i in range(len(next_points)):
 
                 if (coor != point and coor != starting_coor
                         and symbol != '.'
-                        and (digits_matrix[coor[0]][coor[1]] == '.'
-                             or int(digits_matrix[coor[0]][coor[1]]) < point_digit)):
-                    print(coor)
+                        and digits_matrix[coor[0]][coor[1]] != '2'):
                     if coor == (point[0], point[1]-1):
                         if symbol in ('-', 'L', 'F') and point_symbol in ('-', 'J', '7'):
                             digits_matrix[coor[0]][coor[1]] = str(point_digit + 1)
@@ -98,8 +94,8 @@ for i in range(len(next_points)):
                             next_points.append(coor)
                     elif coor == (point[0]-1, point[1]):
                         if symbol in ('|', '7', 'F') and point_symbol in ('|', 'L', 'J'):
-                            print(point_digit)
-                            digits_matrix[coor[0]][coor[1]] = str(point_digit + 1)
+                            past_digit = 0 if '.' else int(digits_matrix[coor[0]][coor[1]])
+                            digits_matrix[coor[0]][coor[1]] = str(point_digit + 1 + past_digit)
                             steps += 1
                             next_points.append(coor)
                     elif coor == (point[0]+1, point[1]):
@@ -110,7 +106,6 @@ for i in range(len(next_points)):
             except IndexError:
                 pass
         next_points.pop(i)
-        print(next_points)
 
 
 print('---Result Digit Matrix:')
