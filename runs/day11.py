@@ -1,3 +1,5 @@
+import re
+
 with open('runs/sources/puzzleinput_11.txt', 'r', encoding='utf-8') as puzzleinput:
     puzzle = puzzleinput.read()
 
@@ -20,10 +22,10 @@ def expand_lines(puzzle_lines):
         current_line = puzzle_lines[i]
         lines.append(current_line)
         if '#' not in current_line:
-            lines.append(current_line)
+            for r in range(1):
+                lines.append(current_line)
 
     return lines
-
 
 def expand_puzzle(puzzle):
     puzzle_lines = expand_lines(puzzle.splitlines())
@@ -34,30 +36,16 @@ def expand_puzzle(puzzle):
     return puzzle
 
 
-def assign_numbers(puzzle):
+def get_coordinates(puzzle):
     expanded_puzzle = expand_puzzle(puzzle).splitlines()
     expanded_list = [[*puzz] for puzz in expanded_puzzle]
+    coordinates = {}
     x = 0
     for i in range(len(expanded_list)):
         for j in range(len(expanded_list[i])):
             if expanded_list[i][j] == '#':
                 x += 1
-                expanded_list[i][j] = str(x)
-
-    expanded_list = [''.join(el) for el in expanded_list]
-    expanded_puzzle = '\n'.join(expanded_list)
-
-    return expanded_puzzle
-
-
-def get_coordinates(puzzle):
-    expanded_puzzle = assign_numbers(puzzle).splitlines()
-    expanded_list = [[*puzz] for puzz in expanded_puzzle]
-    coordinates = {}
-    for i in range(len(expanded_list)):
-        for j in range(len(expanded_list[i])):
-            if expanded_list[i][j] != '.':
-                coordinates[expanded_list[i][j]] = [i, j]
+                coordinates[str(x)] = [i, j]
 
     return coordinates
 
@@ -78,5 +66,9 @@ def shortest_paths(puzzle):
 
     return sum(shortest_paths)
 
+
+# 9 1030
+# 99 8410
+# 999 82210
 
 print(shortest_paths(puzzle_1))
