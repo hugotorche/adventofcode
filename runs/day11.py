@@ -1,4 +1,4 @@
-import re
+import numpy as np
 
 with open('runs/sources/puzzleinput_11.txt', 'r', encoding='utf-8') as puzzleinput:
     puzzle = puzzleinput.read()
@@ -24,29 +24,32 @@ def expand_lines(puzzle_lines):
         if '#' not in current_line:
             for r in range(1):
                 lines.append(current_line)
-
     return lines
 
-def expand_puzzle(puzzle):
-    puzzle_lines = expand_lines(puzzle.splitlines())
-    puzzle_columns = expand_lines([''.join(i) for i in zip(*puzzle_lines)])
 
-    puzzle_lines = [''.join(i) for i in zip(*puzzle_columns)]
-    puzzle = '\n'.join(puzzle_lines)
-    return puzzle
+def expand_puzzle(puzzle):
+    puzzle_columns = expand_lines([''.join(i) for i in zip(*puzzle.splitlines())])
+    print('expand columns ok')
+    puzzle_lines = expand_lines([''.join(i) for i in zip(*puzzle_columns)])
+    print('expand lines ok')
+    return puzzle_lines
 
 
 def get_coordinates(puzzle):
-    expanded_puzzle = expand_puzzle(puzzle).splitlines()
-    expanded_list = [[*puzz] for puzz in expanded_puzzle]
+    expanded_puzzle = expand_puzzle(puzzle)
+    expanded_puzzle = np.array(list(map(list, expanded_puzzle)))
+    print('puzzle ok')
     coordinates = {}
-    x = 0
-    for i in range(len(expanded_list)):
-        for j in range(len(expanded_list[i])):
-            if expanded_list[i][j] == '#':
-                x += 1
-                coordinates[str(x)] = [i, j]
 
+    indices = np.where(expanded_puzzle == '#')
+    row_indices, col_indices = indices
+
+    for i in range(len(row_indices)):
+        key = f"{i+1}"
+        value = [row_indices[i], col_indices[i]]
+        coordinates[key] = value
+
+    print('coordinates done')
     return coordinates
 
 
@@ -67,8 +70,4 @@ def shortest_paths(puzzle):
     return sum(shortest_paths)
 
 
-# 9 1030
-# 99 8410
-# 999 82210
-
-print(shortest_paths(puzzle_1))
+print(shortest_paths(puzzle))
