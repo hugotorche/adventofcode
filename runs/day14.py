@@ -1,9 +1,9 @@
 import numpy as np
 
 with open('runs/sources/puzzleinput_14.txt', 'r', encoding='utf-8') as puzzleinput:
-    puzzle_1 = puzzleinput.read()
+    puzzle = puzzleinput.read()
 
-puzzle = '''O....#....
+puzzle_1 = '''O....#....
 O.OO#....#
 .....##...
 OO.#O....O
@@ -15,10 +15,20 @@ O.#..O.#.#
 #OO..#....'''
 
 
-def init_puzzle(puzzle):
+def init_puzzle(puzzle, direction):
 
-    puzzle_matrix = list(map(list, puzzle.splitlines()))
-    puzzle_matrix = np.array([list(i) for i in zip(*reversed(puzzle_matrix))])
+    if direction == 0:
+        # To north
+        puzzle_matrix = np.array([list(i) for i in zip(*reversed(puzzle))])
+    elif direction == 1:
+        # to west
+        puzzle_matrix = np.array([list(reversed(list(i))) for i in puzzle])
+    elif direction == 2:
+        # To south
+        puzzle_matrix = np.array([list(i) for i in zip(*puzzle)])
+    elif direction == 3:
+        # to east
+        puzzle_matrix = np.array([list(i) for i in puzzle])
 
     return puzzle_matrix
 
@@ -38,60 +48,87 @@ def get_coordinates(rows, columns):
 
 def find_zero_n_blocks(puzzle):
 
-    puzzle_matrix = init_puzzle(puzzle)
-    zero_rows, zero_columns = np.where(puzzle_matrix == 'O')
+    zero_rows, zero_columns = np.where(puzzle == 'O')
     zero_coordinates = get_coordinates(zero_rows, zero_columns)
 
-    block_rows, block_columns = np.where(puzzle_matrix == '#')
+    block_rows, block_columns = np.where(puzzle == '#')
     block_coordinates = get_coordinates(block_rows, block_columns)
 
     return zero_coordinates, block_coordinates
 
 
-def get_load(puzzle):
+def get_load(zero_coordinates, block_coordinates):
 
-    zero_coordinates, block_coordinates = find_zero_n_blocks(puzzle)
     load_per_line = []
-    print(zero_coordinates)
-    print(block_coordinates)
+    max_load = list(zero_coordinates.keys())[-1]
 
     for key in list(zero_coordinates.keys()):
+        len_zero_range = len(zero_coordinates[key])
+        reverse_zero_range = reversed(range(len(zero_coordinates[key])))
+
         if key in list(block_coordinates.keys()):
 
-            # See if no blocking points in the current line
-            if max(block_coordinates[key]) < min(zero_coordinates[key]):
-                zero_coordinates[key] = [list(block_coordinates.keys())[-1] - i
-                                         for i in reversed(range(len(zero_coordinates[key])))]
-            else:
-                # Loop through reversed values
-                for i in reversed(range(len(zero_coordinates[key]))):
-                    # Set last values to max load if no blocking point
-                    if (i == 0
-                       and max(block_coordinates[key]) < zero_coordinates[key][i]):
-                        zero_coordinates[key][i] = list(block_coordinates.keys())[-1]
+            # Loop through reversed values
+            for i in reversed(range(len_zero_range)):
 
-                    else:
-                        # Stop to blocking point if any
-                        for j in range(len(block_coordinates[key])):
-                            if block_coordinates[key][j] > zero_coordinates[key][i]:
-                                zero_coordinates[key][i] = block_coordinates[key][j] - 1
-                                break
+                # Set values to max load if no blocking point
+                if (max(block_coordinates[key]) < zero_coordinates[key][i]):
+                    zero_coordinates[key][i] = list(block_coordinates.keys())[-1]
 
-                        # Avoiding zero values overlapping
-                        if (i != len(zero_coordinates[key]) - 1 and
-                           zero_coordinates[key][i] >= zero_coordinates[key][i+1]):
-                            zero_coordinates[key][i] = zero_coordinates[key][i+1] - 1
+                else:
+                    # Stop to blocking point if any
+                    for j in range(len(block_coordinates[key])):
+                        if block_coordinates[key][j] > zero_coordinates[key][i]:
+                            zero_coordinates[key][i] = block_coordinates[key][j] - 1
+                            break
+
+                # Avoiding values overlapping
+                if (i != len_zero_range - 1 and
+                   zero_coordinates[key][i] >= zero_coordinates[key][i+1]):
+                    zero_coordinates[key][i] = zero_coordinates[key][i+1] - 1
 
         else:
             # If no blocking point in line then enumerate
-            zero_coordinates[key] = [list(block_coordinates.keys())[-1] - i
-                                     for i in reversed(range(len(zero_coordinates[key])))]
+            zero_coordinates[key] = [max_load - i for i in reverse_zero_range]
 
         load_per_line.append(sum(zero_coordinates[key]))
 
     total_load = sum(load_per_line)
 
-    return total_load, zero_coordinates
+    return total_load
 
 
-print(get_load(puzzle))
+def new_grid(zero_coordinates, block_coordinates, direction):
+
+    grid_size = max(max(zero_coordinates), max(block_coordinates))
+    grid = [['.' for _ in range(grid_size)] for _ in range(grid_size)]
+
+    for key, values in zero_coordinates.items():
+        for value in values:
+            grid[key - 1][value - 1] = 'O'
+
+    for key, values in block_coordinates.items():
+        for value in values:
+            grid[key - 1][value - 1] = '#'
+
+    if direction in [0, 1, 2, 3]:
+        # To north
+        grid = list(reversed(list(map(list, zip(*grid)))))
+
+    return grid
+
+
+puzzle_1 = list(map(list, puzzle_1.splitlines()))
+for i in range(4):
+    print(f'{i} -----------')
+    puzzle = init_puzzle(puzzle_1, i)
+    print(f'START -----------')
+    for p in puzzle:
+        print(p)
+    zero_coordinates, block_coordinates = find_zero_n_blocks(puzzle)
+    print(zero_coordinates)
+    print(get_load(zero_coordinates, block_coordinates))
+    print(f'END -----------')
+    for line in new_grid(zero_coordinates, block_coordinates, i):
+        print(line)
+    puzzle_1 = new_grid(zero_coordinates, block_coordinates, i)
